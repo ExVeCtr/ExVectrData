@@ -1,9 +1,8 @@
-# ExVectrHAL
+# ExVectrData
 Part of the ExVeCtr project. 
-ExVectrMath implements high level mathematics like Matricies, vectors, quaternions etc.
-Can be used standalone without any other ExVeCtr libraries. 
+ExVectrData offers data structures used by many systems and many types of data processing things like Kalman, Low-Pass filters etc.
 ## **This project is under initial development. Things will probably break.**
 ## Current goal roadmap:
 - [ ] Port from previous projects.
-- [ ] Implement more stuff
+- [ ] Implement more stuff.
 - [ ] Documentation.
