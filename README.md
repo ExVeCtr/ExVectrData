@@ -3,6 +3,10 @@ Part of the ExVeCtr project.
 ExVectrData offers data structures used by many systems and many types of data processing things like Kalman, Low-Pass filters etc.
 ## **This project is under initial development. Things will probably break.**
 ## Current goal roadmap:
-- [ ] Port from previous projects.
+- [X] ~~Port from previous projects.~~ Not much to port. Added low and high pass filters.
+- [ ] Implement kalman filter.
+- [ ] Implement Complementary filter.
+- [ ] Implement extended kalman filter.
+- [ ] Implement FFT.
 - [ ] Implement more stuff.
 - [ ] Documentation.
