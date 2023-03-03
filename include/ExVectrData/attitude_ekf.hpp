@@ -1,6 +1,7 @@
 #ifndef EXVECTRDATA_ATTITUDEEKF_H
 #define EXVECTRDATA_ATTITUDEEKF_H
 
+#include "ExVectrCore/time_definitions.hpp"
 #include "ExVectrMath.hpp"
 
 #include "value_covariance.hpp"
@@ -78,14 +79,14 @@ namespace VCTR
              * @note The internal state vector is formed as: [V, Q], where V is the angular velocity vector and Q is a unit quaternion rotation from the reference frame to body frame.
              * @param state The state vector and covariance to be used.
             */
-            void setState(const ValueCov<VCTR::Math::Vector<float, 7>, VCTR::Math::Matrix<float, 7, 7>>& state);
+            void setState(const ValueCov<float, 7>& state);
 
         protected:
 
         };
 
         AttitudeEKF::AttitudeEKF() {
-            setState(ValueCov<VCTR::Math::Vector<float, 7>, VCTR::Math::Matrix<float, 7, 7>>{0, 1000});
+            setState(ValueCov<float, 7>{0, 1000});
             q_ = 1;
             stateTimestamp_ = VCTR::Core::NOW();
         }
@@ -130,7 +131,7 @@ namespace VCTR
             return p_;
         }
 
-        void AttitudeEKF::setState(const ValueCov<VCTR::Math::Vector<float, 7>, VCTR::Math::Matrix<float, 7, 7>>& state) {
+        void AttitudeEKF::setState(const ValueCov<float, 7>& state) {
             x_ = state.val;
             p_ = state.cov;
         }

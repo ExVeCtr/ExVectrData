@@ -53,7 +53,7 @@ namespace VCTR
              * @param input Observation/sensor used to correct system. Is a ValueCov object so expects the covariance. Easy use by -> ValueCov{input, covariance}.
             */
             template<size_t UCOLS> 
-            void update(const VCTR::Math::Matrix<TYPE, LEN, UCOLS>& observationModel, const ValueCov<VCTR::Math::Vector<TYPE, UCOLS>, VCTR::Math::Matrix<TYPE, UCOLS, UCOLS>>& input);
+            void update(const VCTR::Math::Matrix<TYPE, LEN, UCOLS>& observationModel, const ValueCov<TYPE, UCOLS>& input);
 
             /**
              * Sets the transition matrix for prediction-
@@ -81,7 +81,7 @@ namespace VCTR
              * Sets the current estimation for the state and covariance.
              * @param state The state vector and covariance to be used.
             */
-            void setState(const ValueCov<VCTR::Math::Vector<TYPE, LEN>, VCTR::Math::Matrix<TYPE, LEN, LEN>>& state);
+            void setState(const ValueCov<TYPE, LEN>& state);
 
         };
 
@@ -89,7 +89,7 @@ namespace VCTR
         KalmanFilter<LEN, TYPE>::KalmanFilter(const VCTR::Math::Matrix<TYPE, LEN, LEN>& transition, const VCTR::Math::Matrix<TYPE, LEN, LEN>& noise) {
             setTransitionMatrix(transition);
             setProcessNoise(noise);
-            setState(ValueCov<VCTR::Math::Vector<TYPE, LEN>, VCTR::Math::Matrix<TYPE, LEN, LEN>>{0, 1000});
+            setState(ValueCov<TYPE, LEN>{0, 1000});
         }
         
         template<size_t LEN, typename TYPE>
@@ -101,7 +101,7 @@ namespace VCTR
 
         template<size_t LEN, typename TYPE>
         template<size_t UCOLS> 
-        void KalmanFilter<LEN, TYPE>::update(const VCTR::Math::Matrix<TYPE, LEN, UCOLS>& observationModel, const ValueCov<VCTR::Math::Vector<TYPE, UCOLS>, VCTR::Math::Matrix<TYPE, UCOLS, UCOLS>>& input) {
+        void KalmanFilter<LEN, TYPE>::update(const VCTR::Math::Matrix<TYPE, LEN, UCOLS>& observationModel, const ValueCov<TYPE, UCOLS>& input) {
             auto y = input.val - observationModel * x_;
             auto s = observationModel * p_ * observationModel.getTranspose() + input.cov;
             auto k = p_ * observationModel.getTranspose() * s.getInverse();
@@ -133,7 +133,7 @@ namespace VCTR
         }
 
         template<size_t LEN, typename TYPE>
-        void KalmanFilter<LEN, TYPE>::setState(const ValueCov<VCTR::Math::Vector<TYPE, LEN>, VCTR::Math::Matrix<TYPE, LEN, LEN>>& state) {
+        void KalmanFilter<LEN, TYPE>::setState(const ValueCov<TYPE, LEN>& state) {
             x_ = state.val;
             p_ = state.cov;
         }
