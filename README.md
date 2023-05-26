@@ -1,7 +1,10 @@
 # ExVectrData
 Part of the ExVeCtr project. 
 ExVectrData offers data structures used by many systems and many types of data processing things like Kalman, Low-Pass filters etc.
-## **This project is under initial development. Things will probably break.**
+## Dependencies:
+The ExVectr libraries below are required by this library to function.
+- Core 
+- HAL.
 ## Current goal roadmap:
 - [X] ~~Port from previous projects.~~ Not much to port. Added low and high pass filters.
 - [X] Implement kalman filter.
@@ -10,3 +13,4 @@ ExVectrData offers data structures used by many systems and many types of data p
 - [ ] Implement FFT.
 - [ ] Implement more stuff.
 - [ ] Documentation.
+## **This project is under initial development. Things will probably break.**
