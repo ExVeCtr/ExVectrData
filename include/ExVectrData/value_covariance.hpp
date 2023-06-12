@@ -20,6 +20,12 @@ namespace VCTR
         struct ValueCov
         {
         public:
+            
+            ValueCov(const Math::Vector<TYPE, NUMVALUES>& value = 0, const Math::Matrix<TYPE, NUMVALUES, NUMVALUES>& covariance = 0) : 
+            val(value), 
+            cov(covariance)
+            {}
+
             /// @brief Values of sensor data.
             Math::Vector<TYPE, NUMVALUES> val = 0;
 
