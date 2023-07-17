@@ -96,20 +96,20 @@ namespace VCTR
         template<size_t CCOLS> 
         void KalmanFilter<LEN, TYPE>::predict(const VCTR::Math::Matrix<TYPE, LEN, CCOLS>& inputModel, const VCTR::Math::Vector<TYPE, CCOLS>& input) {
             x_ = f_ * x_ + inputModel * input;
-            p_ = f_ * p_ * f_.getTranspose() + q_;
+            p_ = f_ * p_ * f_.transpose() + q_;
         }
 
         template<size_t LEN, typename TYPE>
         template<size_t UCOLS> 
         void KalmanFilter<LEN, TYPE>::update(const VCTR::Math::Matrix<TYPE, LEN, UCOLS>& observationModel, const ValueCov<TYPE, UCOLS>& input) {
             auto y = input.val - observationModel * x_;
-            auto s = observationModel * p_ * observationModel.getTranspose() + input.cov;
-            auto k = p_ * observationModel.getTranspose() * s.getInverse();
+            auto s = observationModel * p_ * observationModel.transpose() + input.cov;
+            auto k = p_ * observationModel.transpose() * s.inverse();
 
             x_ = x_ + k * y;
             p_ = (VCTR::Math::Matrix<TYPE, LEN, LEN>::eye() - k * observationModel) * p_;
 
-            p_ = (p_ + p_.getTranspose())*0.5f;
+            p_ = (p_ + p_.transpose())*0.5f;
         }
 
         template<size_t LEN, typename TYPE>
