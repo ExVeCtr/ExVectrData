@@ -109,7 +109,7 @@ namespace VCTR
             x_[5][0] = quat[2][0] + dTimeHalf * (gyro[0][0] * quat[3][0] + gyro[1][0] * quat[0][0] - gyro[2][0] * quat[1][0]);
             x_[6][0] = quat[3][0] - dTimeHalf * (gyro[0][0] * quat[2][0] - gyro[1][0] * quat[1][0] - gyro[2][0] * quat[0][0]);
 
-            float norm = sqrt(x_[3][0] * x_[3][0] + x_[4][0] * x_[4][0] + x_[5][0] * x_[5][0] + x_[6][0] * x_[6][0]);
+            float norm = sqrtf(x_[3][0] * x_[3][0] + x_[4][0] * x_[4][0] + x_[5][0] * x_[5][0] + x_[6][0] * x_[6][0]);
             if (x_[0][0] < 0) // Normalize so the w component is always positive
             {
                 norm = -norm;
@@ -198,7 +198,7 @@ namespace VCTR
             auto P = (VCTR::Math::Matrix<float, 4, 4>::eye() - K * H) * p_.block<4, 4>(3, 3);
 
             // Normalize quaternion and update matricies
-            float norm = sqrt(x[0][0] * x[0][0] + x[1][0] * x[1][0] + x[2][0] * x[2][0] + x[3][0] * x[3][0]);
+            float norm = sqrtf(x[0][0] * x[0][0] + x[1][0] * x[1][0] + x[2][0] * x[2][0] + x[3][0] * x[3][0]);
             if (x[0][0] < 0) // Normalize so the w component is always positive
             {
                 norm = -norm;
@@ -213,7 +213,7 @@ namespace VCTR
             // Update gyroBias using a simple low pass filter
             auto gyroBias = x_.block<3, 1>(0, 0);
             auto gyroModelRot = lastAccData_.data.val.cross(acc) / (float(accData.timestamp - lastAccData_.timestamp)/Core::SECONDS);
-            gyroBias = gyroBias * 0.9999 + (lastGyroData_.data.val - gyroModelRot) * 0.0001;
+            gyroBias = gyroBias * 0.9999f + (lastGyroData_.data.val - gyroModelRot) * 0.0001f;
 
             x_.block(gyroBias, 0, 0);
 
@@ -258,10 +258,10 @@ namespace VCTR
             //auto magRef = VCTR::Math::Matrix<float, 3, 1>({1, 0, 0}); // Reference magnetic field vector
 
             // Calculate the rotation vector between the reference and observed magnetic field vectors
-            auto rotAngle = atan2(mag[1][0], mag[0][0]);
+            auto rotAngle = atan2f(mag[1][0], mag[0][0]);
 
             // Convert rotation vector to quaternion but only a little bit
-            auto rotQuat = VCTR::Math::Quat<float>({0, 0, 1}, -rotAngle * 0.005);
+            auto rotQuat = VCTR::Math::Quat<float>({0, 0, 1}, -rotAngle * 0.005f);
 
             // Fuse the rotation quaternion with the current state quaternion
             auto newQuat = quat * rotQuat;
@@ -364,7 +364,7 @@ namespace VCTR
             mag = quat.rotate(mag.normalize()); //Normalize and rotate back to body frame
 
             // Rotation angle in horizontal plane
-            auto rotAngle = atan2(mag[1][0], mag[0][0]);
+            auto rotAngle = atan2f(mag[1][0], mag[0][0]);
 
             // Convert rotation vector to quaternion but only a little bit
             auto rotQuat = VCTR::Math::Quat<float>({0, 0, 1}, -rotAngle);
