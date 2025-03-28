@@ -52,6 +52,12 @@ namespace VCTR
             Core::Timestamped<ValueCov<float, 3>> lastGyroData_;
             Core::Timestamped<ValueCov<float, 3>> lastAccData_;
             Core::Timestamped<ValueCov<float, 3>> lastMagData_;
+            
+            /// @brief The topic to which the bias estimations are published. The bias is in body frame.
+            Core::Topic<Core::Timestamped<ValueCov<float, 3>>> biasTopic_;
+
+            /// @brief The topic to which the attitude estimations are published. Formed as: [W, Q], where W is the angular velocity in body frame and Q is a unit quaternion rotation from the reference frame to body frame.
+            Core::Topic<Core::Timestamped<ValueCov<float, 7>>> attitudeTopic_;
 
         public:
             /**
@@ -132,13 +138,13 @@ namespace VCTR
             void setProcessNoise(const VCTR::Math::Matrix<float, 7, 7> &noise);
 
             /**
-             * @note The internal state vector is formed as: [V, Q], where V is the angular velocity vector and Q is a unit quaternion rotation from the reference frame to body frame.
+             * @note Current state estimation. Formed as: [W, Q], where W is the angular velocity in body frame and Q is a unit quaternion rotation from the reference frame to body frame.
              * @returns estimation for state.
              */
             const VCTR::Math::Vector<float, 7> &getState();
 
             /**
-             * @note The internal state vector is formed as: [V, Q], where V is the angular velocity vector and Q is a unit quaternion rotation from the reference frame to body frame.
+             * @note Current state estimation covariance. Formed as: [W, Q], where W is the angular velocity in body frame and Q is a unit quaternion rotation from the reference frame to body frame.
              * @returns estimation for covariance.
              */
             const VCTR::Math::Matrix<float, 7, 7> &getCovariance();
@@ -149,6 +155,16 @@ namespace VCTR
              * @param state The state vector and covariance to be used.
              */
             void setState(const ValueCov<float, 7> &state);
+
+            /**
+             * @return The gyro bias vector in body frame topic.
+             */
+            Core::Topic<Core::Timestamped<ValueCov<float, 3>>>& getBiasEstTopic();
+
+            /**
+             * @return The attitude state estimation from reference to body frame in form: [W, Q].
+             */
+            Core::Topic<Core::Timestamped<ValueCov<float, 7>>>& getAttitudeEstTopic();
 
         };
 

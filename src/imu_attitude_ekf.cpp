@@ -44,6 +44,8 @@ namespace VCTR
         void IMUAttitudeEKF::update()
         {
 
+            bool update = false;
+
             // Update state.
             if (gyroSubr_.isDataNew())
             {
@@ -51,19 +53,21 @@ namespace VCTR
                 {
                     gyroInitialised_ = true;
                 }
-                else
-                    updateGyro(gyroSubr_.getItem());
+                updateGyro(gyroSubr_.getItem());
+                update = true;
             }
 
-            if (accSubr_.isDataNew() && (accInitialised_ || lastGyroData_.data.val.magnitude() < 0.1 && gyroInitialised_)) // We can only use the acc if we are not moving. We can assume this to be the case if the gyro is not moving.
+            if (accSubr_.isDataNew() && (accInitialised_ || lastGyroData_.data.val.magnitude() < 0.1 && gyroInitialised_)) // We can only initialise the acc if we are not moving. We can assume this to be the case if the gyro is not moving.
             {
                 if (!accInitialised_)
                 {
                     accInitialised_ = true;
                     initialiseAcc(accSubr_.getItem());
                 }
-                else
+                else {
                     updateAcc(accSubr_.getItem());
+                    update = true;
+                }
             }
 
             if (magSubr_.isDataNew() && accInitialised_) // We can only use the mag if the acc is already initialised
@@ -73,14 +77,40 @@ namespace VCTR
                     magInitialised_ = true;
                     initialiseMag(magSubr_.getItem());
                 }
-                else
+                else {
                     updateMag(magSubr_.getItem());
+                    update = true;
+                }
             }
+
+            if (update) { //Fix covarience and publish the new data.
+                
+                //Symmetrise the cov matrix for stability
+                auto P = p_.block<4, 4>(3, 3);
+                P = (P + P.transpose()) / 2;
+                p_.block(P, 3, 3);
+
+                Core::Timestamped<ValueCov<float, 7>> attitudeData;
+                attitudeData.timestamp = Core::NOW();
+                attitudeData.data.val.block(x_, 3, 0, 3, 0);
+                attitudeData.data.cov.block(p_, 3, 3, 3, 3); //Copy the lower right part from p for attitude quat into cov mat.
+                attitudeData.data.val.block(lastGyroData_.data.val - x_.block<3, 1>(0, 0), 0, 0, 0, 0, 3, 1);
+                attitudeData.data.cov.block(lastGyroData_.data.cov * 2, 0, 0, 0, 0, 3, 3);
+                attitudeTopic_.publish(attitudeData);
+
+                Core::Timestamped<ValueCov<float, 3>> biasData;
+                biasData.timestamp = attitudeData.timestamp;
+                biasData.data.val.block(x_, 0, 0, 0, 0, 3, 1);
+                biasData.data.cov.block(p_, 0, 0, 0, 0, 3, 3); //Copy the lower right part from p for attitude quat into cov mat.
+                biasTopic_.publish(biasData);
+
+            }
+
         }
 
         void IMUAttitudeEKF::predict(int64_t time)
         {
-            
+        
             auto gyro = lastGyroData_;
             gyro.timestamp = time;
 
@@ -100,7 +130,7 @@ namespace VCTR
             auto bias = x_.block<3, 1>(0, 0);
 
             // Transform gyro from sensor to body
-            auto gyro = gyroRot_ * (gyroData.data.val/* - bias*/);
+            auto gyro = gyroRot_ * (gyroData.data.val - bias);
             auto gyroCov = gyroRot_ * gyroData.data.cov * gyroRot_.transpose() * 1000;
 
             // Non linear process model
@@ -207,15 +237,21 @@ namespace VCTR
             x_[4][0] = x[1][0] / norm;
             x_[5][0] = x[2][0] / norm;
             x_[6][0] = x[3][0] / norm;
-
+            
             p_.block(P, 3, 3);
 
             // Update gyroBias using a simple low pass filter
-            auto gyroBias = x_.block<3, 1>(0, 0);
-            auto gyroModelRot = lastAccData_.data.val.cross(acc) / (float(accData.timestamp - lastAccData_.timestamp)/Core::SECONDS);
-            gyroBias = gyroBias * 0.9999f + (lastGyroData_.data.val - gyroModelRot) * 0.0001f;
+            //auto gyroBias = x_.block<3, 1>(0, 0);
 
-            x_.block(gyroBias, 0, 0);
+            //auto gyroModelRot = -lastAccData_.data.val.cross(acc).normalize() * (lastAccData_.data.val.getAngleTo(Math::Vector_F(acc)))  / (float(accData.timestamp - lastAccData_.timestamp)/Core::SECONDS);
+            //auto toPrint = lastAccData_.data.val * Math::Vector_F(acc);
+            //auto measuredGyroBias = lastGyroData_.data.val - gyroModelRot;
+            //measuredGyroBias = Math::Quat_F(x).conjugate().rotate(measuredGyroBias);
+            //measuredGyroBias(2) = 0;
+            //measuredGyroBias = Math::Quat_F(x).rotate(measuredGyroBias);
+            //gyroBias = gyroBias * 0.9999f + measuredGyroBias * 0.0001f;
+
+            //x_.block(gyroBias, 0, 0);
 
             lastAccData_.data.val = acc;
             lastAccData_.data.cov = accCov;
@@ -329,7 +365,7 @@ namespace VCTR
 
             // Transform acc from sensor to body and normalize to get observed gravity vector
             auto acc = (accRot_ * accData.data.val).normalize();
-            //auto accCov = accRot_ * accData.data.cov * accRot_.transpose() * 100;
+            auto accCov = accRot_ * accData.data.cov * accRot_.transpose() * 100;
 
             // Gravity reference
             auto g = Math::Matrix<float, 3, 1>({0, 0, 1});
@@ -346,6 +382,10 @@ namespace VCTR
 
             // Update state
             x_.block(q, 3, 0);
+
+            lastAccData_.data.val = acc;
+            lastAccData_.data.cov = accCov;
+            lastAccData_.timestamp = accData.timestamp;
 
         }
 
@@ -375,6 +415,10 @@ namespace VCTR
             // Update state matricies
             x_.block(newQuat, 3, 0);
 
+            lastMagData_.data.val = mag;
+            //lastMagData_.data.cov = magCov;
+            lastMagData_.timestamp = magData.timestamp;
+
         }
 
         void IMUAttitudeEKF::setProcessNoise(const VCTR::Math::Matrix<float, 7, 7> &noise)
@@ -397,6 +441,17 @@ namespace VCTR
             x_ = state.val;
             p_ = state.cov;
         }
+
+        Core::Topic<Core::Timestamped<ValueCov<float, 3>>>& IMUAttitudeEKF::getBiasEstTopic() 
+        {
+            return biasTopic_;
+        }
+
+        Core::Topic<Core::Timestamped<ValueCov<float, 7>>>& IMUAttitudeEKF::getAttitudeEstTopic() 
+        {
+            return attitudeTopic_;
+        }
+
 
         // ############################### IMUAttitudeEKFTask ###############################
 
@@ -423,8 +478,6 @@ namespace VCTR
             predict();
 
             update();
-
-            p_ = (p_ + p_.transpose()) * 0.5f; // Ensure covariance matrix is symmetric for stability
 
             setPaused(true);
         }
