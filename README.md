@@ -1,3 +1,10 @@
+# IMPORTANT!!!
+Everything in ExVectrData was movec to ExVectrDSP as the naming is clearer. This branch contains the previous code for compatibility. Replave this library to ExVectrDSP to update to newest version.
+
+
+
+
+
 # ExVectrData
 Part of the ExVeCtr project. 
 ExVectrData offers data structures used by many systems and many types of data processing things like Kalman, Low-Pass filters etc.
