@@ -45,7 +45,7 @@ namespace VCTR
         }
             
             
-        size_t Memory_AT24CX::readMem(uint8_t* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) {
+        size_t Memory_AT24CX::readMem(uint8_t* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex) {
             if (index + numBytes > memorySize_) {
                 VCTR::Core::printE("AT24CX readMem(): index out of bounds!\n");
                 return 0;
@@ -58,7 +58,7 @@ namespace VCTR
         }
         
         
-        size_t Memory_AT24CX::writeMem(uint8_t const* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) {
+        size_t Memory_AT24CX::writeMem(uint8_t const* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex) {
             if (index + numBytes > memorySize_) {
                 VCTR::Core::printE("AT24CX writeMem(): index out of bounds!\n");
                 return 0;
@@ -71,7 +71,7 @@ namespace VCTR
         }
 
         
-        size_t Memory_AT24CX::transferFrom(Memory_Interface& memory, size_t numBytes, size_t toIndex = 0, size_t fromIndex = 0) {
+        size_t Memory_AT24CX::transferFrom(Memory_Interface& memory, size_t numBytes, size_t toIndex, size_t fromIndex) {
             if (toIndex + numBytes > memorySize_) {
                 VCTR::Core::printE("AT24CX transferFrom(): index out of bounds!\n");
                 return 0;
