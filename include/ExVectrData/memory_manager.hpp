@@ -39,8 +39,8 @@ namespace VCTR
              */
             template<typename TYPE>
             uint32_t allocateItem(const TYPE& value = TYPE(), uint32_t key = 0) {
-                auto key = allocateSpace(sizeof(TYPE), key);
-                if (key != 0) {
+                auto ret = allocateSpace(sizeof(TYPE), key);
+                if (ret != 0) {
                     writeItem(value, key); // Write the value to the memory.
                 }
                 return key;
