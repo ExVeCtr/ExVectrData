@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.0.0)
+cmake_minimum_required(VERSION 3.5.0)
 project(ExVectrData VERSION 0.1.0)
 
 file(GLOB_RECURSE SRC_FILES src/*.cpp)
@@ -10,5 +10,5 @@ function(addExVectrDependency libName)
 endfunction()
 
 addExVectrDependency(ExVectrCore)
-addExVectrDependency(ExVectrMath)
-#addExVectrDependency(ExVectrHAL)
+#addExVectrDependency(ExVectrMath)
+addExVectrDependency(ExVectrHAL)
