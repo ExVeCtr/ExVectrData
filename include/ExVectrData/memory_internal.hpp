@@ -35,8 +35,8 @@ namespace VCTR
              * @return Number of bytes read from the memory and placed into the buffer.
              */
             size_t readMem(uint8_t* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override {
-                if (index + numBytes > SIZE) return 0; // Out of bounds.
-                if (bufferIndex + numBytes > SIZE) return 0; // Out of bounds.
+                if (index + numBytes > SIZE) return 0; // Out of bounds of internal array
+                //if (bufferIndex > numBytes) return 0; // Out of bounds of given buffer
                 memcpy(bufferPtr + bufferIndex, internalMem_ + index, numBytes); // Copy the data from the memory to the buffer.
                 return numBytes;
             }
@@ -51,7 +51,7 @@ namespace VCTR
              */
             size_t writeMem(uint8_t const* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override {
                 if (index + numBytes > SIZE) return 0; // Out of bounds.
-                if (bufferIndex + numBytes > SIZE) return 0; // Out of bounds.
+                //if (bufferIndex + numBytes > SIZE) return 0; // Out of bounds.
                 memcpy(internalMem_ + index, bufferPtr + bufferIndex, numBytes); // Copy the data from the buffer to the memory.
                 return numBytes;
             }
@@ -61,12 +61,12 @@ namespace VCTR
              * @param memory Memory to receive data from.
              * @param numBytes Number of bytes to be transferred.
              * @param toIndex Index to where the data will be written to this memory.
-             * @param fromIndex Index from where the data will be read in the given memory.
+             * @param fromIndex Index from where we start copying the memory from the given memory.
              * @return Number of bytes written to this memory from the given memory.
              */
             size_t transferFrom(Memory_Interface& memory, size_t numBytes, size_t toIndex = 0, size_t fromIndex = 0) override {
                 if (toIndex + numBytes > SIZE) return 0; // Out of bounds.
-                if (fromIndex + numBytes > SIZE) return 0; // Out of bounds.
+                if (fromIndex + numBytes > memory.size()) return 0; // Out of bounds.
                 size_t bytesRead = memory.readMem(internalMem_, numBytes, fromIndex, toIndex); // Read the data from the given memory to this memory.
                 return bytesRead;
             }
@@ -77,6 +77,10 @@ namespace VCTR
             size_t size() override {
                 return SIZE; // Return the size of the memory.
             }
+
+            using Memory_Interface::accessIndex; ///< Access the memory at the given index. This is a virtual function that will be implemented in the derived class.
+            using Memory_Interface::readMem; ///< Read data from the memory. This is a virtual function that will be implemented in the derived class.
+            using Memory_Interface::writeMem; ///< Write data to the memory. This is a virtual function that will be implemented in the derived class.
             
 
         };
