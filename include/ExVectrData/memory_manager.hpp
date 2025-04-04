@@ -21,11 +21,11 @@ namespace VCTR
         {
         private:
 
-            constexpr static uint8_t VERSION_ = 1; ///< Update to version number means previous versions are not compatable.
+            constexpr static uint16_t VERSION_ = 1; ///< Update to version number means previous versions are not compatable.
 
             Memory_Interface& memory; ///< Memory to be managed.
 
-            uint32_t allocatedItems = 0; ///< Number of allocated items in the memory.
+            uint16_t allocatedItems = 0; ///< Number of allocated items in the memory.
         
 
         public:
@@ -39,8 +39,10 @@ namespace VCTR
              */
             template<typename TYPE>
             uint32_t allocateItem(const TYPE& value = TYPE(), uint32_t key = 0) {
+                //LOG_MSG("Allocating Item\n");
                 auto ret = allocateSpace(sizeof(TYPE), key);
                 if (ret != 0) {
+                    //LOG_MSG("Writing Item\n");
                     writeItem(value, key); // Write the value to the memory.
                 }
                 return key;
@@ -60,8 +62,10 @@ namespace VCTR
             template<typename TYPE>
             bool readItem(TYPE& value, uint32_t key) {
 
-                uint32_t lastIndex, foundIndex;
-                findItem(lastIndex, foundIndex, key, sizeof(TYPE));
+                //LOG_MSG("Reading Item. Key: %d\n", key);
+
+                uint32_t lastIndex, foundIndex, nextIndex;
+                findItem(lastIndex, foundIndex, nextIndex, key, sizeof(TYPE));
 
                 if (foundIndex == 0) return false; // Item not found.
 
@@ -81,8 +85,8 @@ namespace VCTR
             template<typename TYPE>
             bool writeItem(const TYPE& value, uint32_t key) {
 
-                uint32_t lastIndex, foundIndex;
-                findItem(lastIndex, foundIndex, key, sizeof(TYPE));
+                uint32_t lastIndex, foundIndex, nextIndex;
+                findItem(lastIndex, foundIndex, nextIndex, key, sizeof(TYPE));
 
                 if (foundIndex == 0) return false; // Item not found.
 
@@ -109,6 +113,17 @@ namespace VCTR
              */
             //size_t usedMemory();
 
+            /**
+             * * @returns the version of the memory manager. NOT the memory manager version currently saved onto the memory.
+             */
+            uint8_t getVersion() { return VERSION_; }
+
+            /**
+             * * @returns the version currently saved onto the memory. If version is 0, then either the memory isnt initialized or there was an error reading the memory.
+             * * @note If versions mismatch, then the memory must be reset via clearMemory() before use. Otherwise all operations will fail.
+             */
+            uint8_t getVersionSaved();
+
 
         private:
 
@@ -116,10 +131,11 @@ namespace VCTR
              * * @brief Finds the index of the item in the memory with the given key. Will also check if the memory is valid for manager.
              * * @param lastIndex The index of the previous item. This could be the same as the index of the item found if there is only one item in the memory.
              * * @param indexFound If key is 0, then the index of the first free space or 0 if none found or failure. If key is not 0, then the index of the item with the given key will be returned or 0 if not found.
+             * * @param nextIndex The index of the next item in the memory. If the key is given and there is no next item, then this will be 0.
              * * @param key Key to the item in the memory. If zero, then the index of first free space for the given size will be returned.
              * * @param numBytes Number of bytes to be read from the memory. Used to verify if the item matches the expected size or size of free space. If zero, then the first item with the given key will be returned.
              */
-            void findItem(uint32_t& lastIndex, uint32_t& indexFound, uint32_t key, uint32_t numBytes = 0);
+            void findItem(uint32_t& lastIndex, uint32_t& indexFound, uint32_t& nextIndex, uint32_t key, uint32_t numBytes = 0);
 
             /**
              * * @brief Allocates memory in the given memory with the given size in bytes
