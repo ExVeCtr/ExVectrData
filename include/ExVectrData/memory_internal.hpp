@@ -35,8 +35,8 @@ namespace VCTR
              * @return Number of bytes read from the memory and placed into the buffer.
              */
             size_t readMem(uint8_t* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override {
-                if (index + numBytes > SIZE) return 0; // Out of bounds of internal array
-                //if (bufferIndex > numBytes) return 0; // Out of bounds of given buffer
+                if (index + numBytes > SIZE) numBytes = SIZE - index; // Out of bounds. Reduce the number of bytes to be read.
+                if (bufferIndex + numBytes > SIZE) numBytes = SIZE - bufferIndex; // Out of bounds. Reduce the number of bytes to be read.
                 memcpy(bufferPtr + bufferIndex, internalMem_ + index, numBytes); // Copy the data from the memory to the buffer.
                 return numBytes;
             }
@@ -50,8 +50,8 @@ namespace VCTR
              * @return Number of bytes written to the memory from the buffer.
              */
             size_t writeMem(uint8_t const* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override {
-                if (index + numBytes > SIZE) return 0; // Out of bounds.
-                //if (bufferIndex + numBytes > SIZE) return 0; // Out of bounds.
+                if (index + numBytes > SIZE) numBytes = SIZE - index; // Out of bounds. Reduce the number of bytes to be written.
+                if (bufferIndex + numBytes > SIZE) numBytes = SIZE - bufferIndex; // Out of bounds. Reduce the number of bytes to be written.
                 memcpy(internalMem_ + index, bufferPtr + bufferIndex, numBytes); // Copy the data from the buffer to the memory.
                 return numBytes;
             }
@@ -64,9 +64,9 @@ namespace VCTR
              * @param fromIndex Index from where we start copying the memory from the given memory.
              * @return Number of bytes written to this memory from the given memory.
              */
-            size_t transferFrom(Memory_Interface& memory, size_t numBytes, size_t toIndex = 0, size_t fromIndex = 0) override {
-                if (toIndex + numBytes > SIZE) return 0; // Out of bounds.
-                if (fromIndex + numBytes > memory.size()) return 0; // Out of bounds.
+            size_t transferFrom(Memory_Interface& memory, size_t numBytes = SIZE, size_t toIndex = 0, size_t fromIndex = 0) override {
+                if (toIndex + numBytes > SIZE) numBytes = SIZE - toIndex; // Out of bounds. Reduce the number of bytes to be written.
+                if (fromIndex + numBytes > memory.size()) numBytes = memory.size() - fromIndex; // Out of bounds. Reduce the number of bytes to be written.
                 size_t bytesRead = memory.readMem(internalMem_, numBytes, fromIndex, toIndex); // Read the data from the given memory to this memory.
                 return bytesRead;
             }

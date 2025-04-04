@@ -53,12 +53,12 @@ namespace VCTR
             /**
              * @brief Transfers data from given memory to this memory.
              * @param memory Memory to receive data from.
-             * @param numBytes Number of bytes to be transferred.
+             * @param numBytes Number of bytes to be transferred. Defaults to SIZE_MAX, which means transfer all the data from the given memory.
              * @param toIndex Index to where the data will be written to this memory.
              * @param fromIndex Index from where the data will be read in the given memory.
              * @return Number of bytes written to this memory from the given memory.
              */
-            virtual size_t transferFrom(Memory_Interface& memory, size_t numBytes, size_t toIndex = 0, size_t fromIndex = 0) = 0;
+            virtual size_t transferFrom(Memory_Interface& memory, size_t numBytes = SIZE_MAX, size_t toIndex = 0, size_t fromIndex = 0) = 0;
 
             /**
              * @returns the length of the memory in bytes. NOT the amount of memory used.

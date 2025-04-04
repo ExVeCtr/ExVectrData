@@ -46,10 +46,8 @@ namespace VCTR
             
             
         size_t Memory_AT24CX::readMem(uint8_t* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex) {
-            if (index + numBytes > memorySize_) {
-                VCTR::Core::printE("AT24CX readMem(): index out of bounds!\n");
-                return 0;
-            }
+            if (bufferIndex + numBytes > memorySize_) numBytes = memorySize_ - bufferIndex; // Out of bounds. Reduce the number of bytes to be read.
+            if (index + numBytes > memorySize_) numBytes = memorySize_ - index; // Out of bounds. Reduce the number of bytes to be read.
             if (readBus(bufferPtr, numBytes, index)) {
                 VCTR::Core::printE("AT24CX readMem(): failed to read data from bus!\n");
                 return 0;
@@ -59,10 +57,8 @@ namespace VCTR
         
         
         size_t Memory_AT24CX::writeMem(uint8_t const* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex) {
-            if (index + numBytes > memorySize_) {
-                VCTR::Core::printE("AT24CX writeMem(): index out of bounds!\n");
-                return 0;
-            }
+            if (bufferIndex + numBytes > memorySize_) numBytes = memorySize_ - bufferIndex; // Out of bounds. Reduce the number of bytes to be written.
+            if (index + numBytes > memorySize_) numBytes = memorySize_ - index; // Out of bounds. Reduce the number of bytes to be written.
             if (writeBus(bufferPtr, numBytes, index)) {
                 VCTR::Core::printE("AT24CX writeMem(): failed to write data to bus!\n");
                 return 0;
@@ -72,10 +68,8 @@ namespace VCTR
 
         
         size_t Memory_AT24CX::transferFrom(Memory_Interface& memory, size_t numBytes, size_t toIndex, size_t fromIndex) {
-            if (toIndex + numBytes > memorySize_) {
-                VCTR::Core::printE("AT24CX transferFrom(): index out of bounds!\n");
-                return 0;
-            }
+            if (toIndex + numBytes > memorySize_) numBytes = memorySize_ - toIndex; // Out of bounds. Reduce the number of bytes to be written.
+            if (fromIndex + numBytes > memory.size()) numBytes = memory.size() - fromIndex; // Out of bounds. Reduce the number of bytes to be written.
             uint8_t buffer_[numBytes];
             if (memory.readMem(buffer_, numBytes, fromIndex) != numBytes) {
                 VCTR::Core::printE("AT24CX transferFrom(): failed to read data from given memory!\n");
