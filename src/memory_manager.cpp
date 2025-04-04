@@ -153,10 +153,14 @@ namespace VCTR
             }
 
             //Looks like the memory is valid and version matches.
+
             if (firstItemIndex == 0) { // No items in the memory.
                 //LOG_MSG("No items in the memory.\n");
                 lastIndex = 0;
-                indexFound = 20; // Set the index to the first item in the memory.
+                if (key == 0)
+                    indexFound = 20; // Set the index to the first item in the memory.
+                else 
+                    indexFound = 0; // Set the index to 0, as there is no item with the given key.
                 return; // No items in the memory. We can allocate space at the first item.
             }
 
@@ -245,7 +249,7 @@ namespace VCTR
             
         }
 
-        uint8_t Memory_Manager::getVersionSaved() {
+        uint8_t Memory_Manager::getMemoryVersion() {
 
             uint16_t version = 0;
             uint16_t header = 0;

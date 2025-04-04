@@ -67,6 +67,8 @@ namespace VCTR
                 uint32_t lastIndex, foundIndex, nextIndex;
                 findItem(lastIndex, foundIndex, nextIndex, key, sizeof(TYPE));
 
+                //LOG_MSG("Found item at index %d, lastIndex: %d\n", foundIndex, lastIndex);
+
                 if (foundIndex == 0) return false; // Item not found.
 
                 memory.accessIndex(foundIndex + 10); // Set the access index to the beginning of the item data.
@@ -116,13 +118,13 @@ namespace VCTR
             /**
              * * @returns the version of the memory manager. NOT the memory manager version currently saved onto the memory.
              */
-            uint8_t getVersion() { return VERSION_; }
+            uint8_t getManagerVersion() { return VERSION_; }
 
             /**
              * * @returns the version currently saved onto the memory. If version is 0, then either the memory isnt initialized or there was an error reading the memory.
              * * @note If versions mismatch, then the memory must be reset via clearMemory() before use. Otherwise all operations will fail.
              */
-            uint8_t getVersionSaved();
+            uint8_t getMemoryVersion();
 
 
         private:
