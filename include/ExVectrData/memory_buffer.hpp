@@ -15,8 +15,7 @@ namespace VCTR
     {
 
         /**
-         * @brief Class to help synchronise data between two memories. The primary memory is used for changes. Once sync is called, changes are written to the secondary memory.
-         * @note Both memories must be of the same size.
+         * @brief DO NOT USE THIS CLASS! IT WILL BE REMOED AND REPLACED WITH A CACHE SIMILAR CLASS!
          */
         class Memory_Buffer
         {
