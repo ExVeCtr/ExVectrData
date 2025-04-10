@@ -27,6 +27,14 @@ namespace VCTR
         public:
 
             /**
+             * @brief Can be used to access the memory directly. This is not recommended as it can lead to memory corruption, especially if using the memory manager.
+             * @param index Index to the memory. Default is 0.
+             * @return Pointer to the memory at the given index.
+             */
+            template<typename TYPE = uint8_t>
+            TYPE* getMemoryPointer(size_t index = 0) { return internalMem_ + index; }
+
+            /**
              * @brief Reads data from the memory.
              * @param bufferPtr Pointer to the buffer where the data will be written to.
              * @param numBytes Number of bytes to be read.
