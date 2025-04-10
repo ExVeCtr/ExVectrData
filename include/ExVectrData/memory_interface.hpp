@@ -28,7 +28,7 @@ namespace VCTR
 
         public:
 
-            virtual ~Memory_Interface() {}
+            virtual ~Memory_Interface() = default;
 
             /**
              * @brief Reads data from the memory.
