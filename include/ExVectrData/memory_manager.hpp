@@ -14,7 +14,7 @@ namespace VCTR
     {
 
         /**
-         * @brief Memory Manager takes care of allocating and deallocating memory in the given Memory_Interface.
+         * @brief Memory Manager takes care of allocating and deallocating memory in the given Memory_Interface. Since the Memory manager is stateless, multiple managers can use the same memory.
          * @note Keep in mind that the memory manager is slower than direct memory.
          */
         class Memory_Manager
@@ -25,7 +25,7 @@ namespace VCTR
 
             Memory_Interface& memory; ///< Memory to be managed.
 
-            uint16_t allocatedItems = 0; ///< Number of allocated items in the memory.
+            //uint16_t allocatedItems = 0; ///< Number of allocated items in the memory.
         
 
         public:
@@ -97,6 +97,19 @@ namespace VCTR
 
                 return true; // Success.
 
+            }
+
+            /**
+             * * @brief Will find the item with the given key and return the index of the item data in the memory.
+             * * @note This can be used to retrieve the pointer to the item for direct memory access (e.g. Memory internal as malloc() replacement), BE CAREFULL TO NOT WRITE OUTSIDE THE DATA BOUNDARIES!
+             * * @param key Key to the item in the memory.
+             * * @param numBytes Expacted size of the item in bytes. If zero, then the first item with the given key will be returned.
+             */
+            uint32_t getItemDataIndex(uint32_t key, uint32_t numBytes = 0) {
+                if (key == 0) return 0; // Item not findable
+                uint32_t lastIndex, foundIndex, nextIndex;
+                findItem(lastIndex, foundIndex, nextIndex, key, numBytes);
+                return foundIndex + 10; // Set the access index to the beginning of the item data.
             }
 
             /**

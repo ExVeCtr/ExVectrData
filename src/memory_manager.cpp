@@ -32,9 +32,7 @@ namespace VCTR
 
         Memory_Manager::Memory_Manager(Memory_Interface& memory) :
             memory(memory)
-        {
-            allocatedItems = 0;
-        }
+        {}
 
         void Memory_Manager::deallocateItem(uint32_t key) {
 
@@ -241,9 +239,12 @@ namespace VCTR
                 memory.writeMem((uint32_t)indexFound); // Write the index to the next item in the memory.
             }
 
-            allocatedItems++; // Increment the number of allocated items in the memory.
+            uint16_t allocatedItems; // Increment the number of allocated items in the memory.
             memory.accessIndex(4); // Set the access index to the beginning of the memory.
-            memory.writeMem((uint16_t)allocatedItems); // Write the new number allocated items
+            memory.readMem(allocatedItems); // Write the new number allocated items
+            allocatedItems++;
+            memory.accessIndex(4);
+            memory.writeMem(allocatedItems);
 
             return key; // Return the key of the item. if no key is given, use the index as the key.
             
