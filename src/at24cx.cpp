@@ -42,6 +42,8 @@ namespace VCTR
 
             ioBus_ = &ioBus;
 
+            return true;
+
         }
             
             
