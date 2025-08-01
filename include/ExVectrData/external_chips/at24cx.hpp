@@ -4,10 +4,9 @@
 #include "stdint.h"
 #include "stddef.h"
 
-#include "ExVectrHAL/digital_io.hpp"
+// #include "ExVectrHAL/digital_io.hpp"
 
 #include "ExVectrData/memory_interface.hpp"
-
 
 namespace VCTR
 {
@@ -15,25 +14,24 @@ namespace VCTR
     namespace Data
     {
 
+        class HAL::DigitalIO; // Forward declaration of DigitalIO class to avoid circular dependency.
+
         /**
          * @brief This class implements the Memory_Interface for the AT24CX series of EEPROMs.
          */
         class Memory_AT24CX : public Memory_Interface
         {
         private:
-            
-            static constexpr uint8_t AT24CX_ID = 0x50; //AT24CX ID
+            static constexpr uint8_t AT24CX_ID = 0x50; // AT24CX ID
 
-            bool initialised_ = false; //If the memory has been initialised and is in working condition
+            bool initialised_ = false; // If the memory has been initialised and is in working condition
 
             HAL::DigitalIO *ioBus_ = nullptr;
 
-            size_t memorySize_ = 0; //Size of the memory in bytes
-            size_t pageSize_ = 0; //Size of the memory page in bytes
-            
+            size_t memorySize_ = 0; // Size of the memory in bytes
+            size_t pageSize_ = 0;   // Size of the memory page in bytes
 
         public:
-
             /**
              * @brief Constructor.
              * @param memorySize Size of the memory in bytes.
@@ -46,7 +44,7 @@ namespace VCTR
              * @param ioBus IO bus to use for communications.
              */
             bool initMemory(HAL::DigitalIO &ioBus);
-            
+
             /**
              * @brief Reads data from the memory.
              * @param bufferPtr Pointer to the buffer where the data will be written to.
@@ -55,8 +53,8 @@ namespace VCTR
              * @param bufferIndex Index to where the data will be written in the buffer.
              * @return Number of bytes read from the memory and placed into the buffer.
              */
-            size_t readMem(uint8_t* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override;
-            
+            size_t readMem(uint8_t *bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override;
+
             /**
              * @brief Writes data to the memory.
              * @param bufferPtr Pointer to the buffer where the data will be read from.
@@ -65,7 +63,7 @@ namespace VCTR
              * @param bufferIndex Index from where the data will be read in the buffer.
              * @return Number of bytes written to the memory from the buffer.
              */
-            size_t writeMem(uint8_t const* bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override;
+            size_t writeMem(uint8_t const *bufferPtr, size_t numBytes, size_t index, size_t bufferIndex = 0) override;
 
             /**
              * @brief Transfers data from given memory to this memory.
@@ -75,7 +73,7 @@ namespace VCTR
              * @param fromIndex Index from where the data will be read in the given memory.
              * @return Number of bytes written to this memory from the given memory.
              */
-            size_t transferFrom(Memory_Interface& memToReceiveData, size_t numBytes = SIZE_MAX, size_t toIndex = 0, size_t fromIndex = 0) override;
+            size_t transferFrom(Memory_Interface &memToReceiveData, size_t numBytes = SIZE_MAX, size_t toIndex = 0, size_t fromIndex = 0) override;
 
             /**
              * @returns the length of the memory in bytes.
@@ -83,32 +81,19 @@ namespace VCTR
             size_t size() override;
 
         private:
-
             /**
              * @brief Writes data to the device on the bus.
              */
-            bool writeBus(const uint8_t* bufferPtr, size_t numBytes, size_t address);
+            bool writeBus(const uint8_t *bufferPtr, size_t numBytes, size_t address);
 
             /**
              * @brief Reads data from the device on the bus.
              */
-            bool readBus(uint8_t* bufferPtr, size_t numBytes, size_t address);
-
-
+            bool readBus(uint8_t *bufferPtr, size_t numBytes, size_t address);
         };
 
     }
 
 }
-
-
-
-
-
-
-
-
-
-
 
 #endif
