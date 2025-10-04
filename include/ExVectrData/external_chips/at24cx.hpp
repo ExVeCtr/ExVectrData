@@ -1,10 +1,8 @@
-#ifndef EXVECTRDATA_MEMORYCACHE_HPP_
-#define EXVECTRDATA_MEMORYCACHE_HPP_
+#ifndef EXVECTRDATA_AT24CX_HPP_
+#define EXVECTRDATA_AT24CX_HPP_
 
 #include "stdint.h"
 #include "stddef.h"
-
-// #include "ExVectrHAL/digital_io.hpp"
 
 #include "ExVectrData/memory_interface.hpp"
 
